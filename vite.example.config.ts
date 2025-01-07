@@ -1,6 +1,4 @@
-import path from 'path';
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   build: {
@@ -8,9 +6,6 @@ export default defineConfig({
     emptyOutDir: true,
     target: 'esnext',
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'index.html'),
-      },
       output: {
         format: 'es',
         chunkFileNames: 'assets/[name]-[hash].js',
@@ -18,7 +13,10 @@ export default defineConfig({
       }
     }
   },
-  plugins: [dts({ exclude: "**/*.spec.ts" })],
+  worker: {
+    format: 'es',
+    plugins: []
+  },
   server: {
     headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',

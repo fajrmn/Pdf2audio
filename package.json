@@ -42,16 +42,17 @@
     "webnn"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "rm -r -f ./dist && tsc && vite build",
-    "preview": "vite preview",
+    "dev": "vite --config vite.example.config.ts",
+    "build": "vite build --config vite.example.config.ts",
+    "preview": "vite preview --config vite.example.config.ts",
     "test": "npx playwright test --project=chromium"
   },
   "devDependencies": {
     "@playwright/test": "^1.35.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.3.1",
-    "vite-plugin-dts": "^3.9.1"
+    "@types/node": "^20.3.1",
+    "typescript": "^5.1.3",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.0.2"
   },
   "peerDependencies": {
     "onnxruntime-web": "^1.18.0"
