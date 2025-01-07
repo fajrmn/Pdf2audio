@@ -18,11 +18,20 @@ document.querySelector('#app')!.innerHTML = `
         <span class="text-blue-600">VITS</span> Text-to-Speech
       </h1>
       
-      <div class="mb-4">
-        <label for="voiceSelect" class="block text-sm font-medium text-gray-700 mb-2">Select Voice</label>
-        <select id="voiceSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">Loading voices...</option>
-        </select>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label for="languageSelect" class="block text-sm font-medium text-gray-700 mb-2">Select Language</label>
+          <select id="languageSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Loading languages...</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="voiceSelect" class="block text-sm font-medium text-gray-700 mb-2">Select Voice</label>
+          <select id="voiceSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+            <option value="">Select a language first</option>
+          </select>
+        </div>
       </div>
       
       <div class="mb-4">
@@ -42,7 +51,7 @@ document.querySelector('#app')!.innerHTML = `
       
       <button 
         id="btn" 
-        class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled
       >
         Generate Speech
@@ -56,6 +65,7 @@ document.querySelector('#app')!.innerHTML = `
 `;
 
 // Get DOM elements
+const languageSelect = document.getElementById('languageSelect') as HTMLSelectElement;
 const voiceSelect = document.getElementById('voiceSelect') as HTMLSelectElement;
 const textInput = document.getElementById('textInput') as HTMLTextAreaElement;
 const generateBtn = document.getElementById('btn') as HTMLButtonElement;
@@ -63,16 +73,17 @@ const audioPlayer = document.getElementById('audioPlayer') as HTMLAudioElement;
 const loadingContainer = document.getElementById('loadingContainer') as HTMLDivElement;
 const audioContainer = document.getElementById('audioContainer') as HTMLDivElement;
 
+// Store voices data
+let availableVoices: tts.Voice[] = [];
+let voicesByLanguage: {[key: string]: tts.Voice[]} = {};
+
 // Populate voices dynamically
 async function populateVoices() {
   try {
-    const availableVoices = await tts.voices();
-    
-    // Clear existing options
-    voiceSelect.innerHTML = '';
+    availableVoices = await tts.voices();
     
     // Group voices by language
-    const voicesByLanguage: {[key: string]: tts.Voice[]} = {};
+    voicesByLanguage = {};
     availableVoices.forEach(voice => {
       const langKey = `${voice.language.code} - ${voice.language.name_english}`;
       if (!voicesByLanguage[langKey]) {
@@ -81,39 +92,44 @@ async function populateVoices() {
       voicesByLanguage[langKey].push(voice);
     });
 
-    // Keep track of voice count
-    let voiceCount = 1;
-
-    // Create optgroups
-    Object.entries(voicesByLanguage).forEach(([langKey, voices]) => {
-      const optgroup = document.createElement('optgroup');
-      optgroup.label = langKey;
-      
-      voices.forEach(voice => {
-        const option = document.createElement('option');
-        option.value = voice.key;
-        option.textContent = `${voiceCount} - ${voice.name_english} (${voice.quality})`;
-        optgroup.appendChild(option);
-        
-        voiceCount++;
-      });
-      
-      voiceSelect.appendChild(optgroup);
+    // Populate language dropdown
+    languageSelect.innerHTML = '<option value="">Select a language</option>';
+    Object.keys(voicesByLanguage).sort().forEach(langKey => {
+      const option = document.createElement('option');
+      option.value = langKey;
+      option.textContent = langKey;
+      languageSelect.appendChild(option);
     });
 
-    // Enable generate button
-    generateBtn.disabled = false;
-    
-    // Set a default voice if available
-    const defaultVoice = availableVoices.find(v => v.key === 'en_US-hfc_female-medium');
-    if (defaultVoice) {
-      voiceSelect.value = defaultVoice.key;
-    }
+    // Enable language select
+    languageSelect.disabled = false;
   } catch (error) {
     console.error('Failed to load voices:', error);
-    voiceSelect.innerHTML = '<option value="">Failed to load voices</option>';
+    languageSelect.innerHTML = '<option value="">Failed to load languages</option>';
   }
 }
+
+// Handle language selection
+languageSelect.addEventListener('change', () => {
+  const selectedLanguage = languageSelect.value;
+  voiceSelect.innerHTML = '';
+  
+  if (selectedLanguage) {
+    const voices = voicesByLanguage[selectedLanguage];
+    voices.forEach((voice, index) => {
+      const option = document.createElement('option');
+      option.value = voice.key;
+      option.textContent = `${index + 1} - ${voice.name_english} (${voice.quality})`;
+      voiceSelect.appendChild(option);
+    });
+    voiceSelect.disabled = false;
+    generateBtn.disabled = false;
+  } else {
+    voiceSelect.innerHTML = '<option value="">Select a language first</option>';
+    voiceSelect.disabled = true;
+    generateBtn.disabled = true;
+  }
+});
 
 // Populate voices on load
 populateVoices();
@@ -134,6 +150,8 @@ generateBtn.addEventListener('click', async () => {
   // Show loading
   loadingContainer.classList.remove('hidden');
   generateBtn.disabled = true;
+  languageSelect.disabled = true;
+  voiceSelect.disabled = true;
 
   try {
     // Ensure the model is downloaded
@@ -152,9 +170,11 @@ generateBtn.addEventListener('click', async () => {
     worker.addEventListener('message', (event: MessageEvent<{ type: 'result', audio: Blob }>) => {
       if (event.data.type != 'result') return;
 
-      // Hide loading
+      // Hide loading and re-enable controls
       loadingContainer.classList.add('hidden');
       generateBtn.disabled = false;
+      languageSelect.disabled = false;
+      voiceSelect.disabled = false;
 
       // Show audio
       audioPlayer.src = URL.createObjectURL(event.data.audio);
@@ -167,6 +187,8 @@ generateBtn.addEventListener('click', async () => {
       console.error('Worker error:', error);
       loadingContainer.classList.add('hidden');
       generateBtn.disabled = false;
+      languageSelect.disabled = false;
+      voiceSelect.disabled = false;
       alert('Failed to generate speech. Check console for details.');
     });
 
@@ -174,6 +196,8 @@ generateBtn.addEventListener('click', async () => {
     console.error('Speech generation error:', error);
     loadingContainer.classList.add('hidden');
     generateBtn.disabled = false;
+    languageSelect.disabled = false;
+    voiceSelect.disabled = false;
     alert('Failed to generate speech. Check console for details.');
   }
 });
