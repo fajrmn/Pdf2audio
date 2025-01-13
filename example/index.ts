@@ -21,62 +21,59 @@ document.querySelector('#app')!.innerHTML = `
       </h1>
       
       <!-- PDF Upload Section -->
-      <div class="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg">
-        <h2 class="text-lg font-semibold text-gray-700 mb-2">Upload PDF</h2>
-        <div class="flex items-center space-x-2 mb-2">
-          <input 
-            type="file" 
-            id="pdfInput" 
+      <div class="mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium text-gray-700">Upload PDF</label>
+        </div>
+        <div 
+          id="dropZone"
+          class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors duration-200 bg-gray-50"
+        >
+          <input
+            type="file"
+            id="pdfFileInput"
             accept=".pdf"
-            class="hidden" 
+            class="hidden"
           />
+          <div class="flex flex-col items-center justify-center space-y-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="text-sm text-gray-600">Drop your PDF here or <span class="text-blue-500">click to upload</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Input Section -->
+      <div class="mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <label for="textInput" class="text-sm font-medium text-gray-700">Enter Text</label>
           <button 
-            id="pdfUploadBtn"
-            class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out"
+            id="expandTextBtn"
+            class="text-gray-500 hover:text-gray-700 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100"
+            title="Expand/Collapse"
           >
-            Choose PDF File
+            <svg 
+              id="expandIcon" 
+              xmlns="http://www.w3.org/2000/svg" 
+              class="h-5 w-5 icon-collapsed" 
+              viewBox="0 0 20 20" 
+              fill="currentColor"
+            >
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H5.414l4.293 4.293a1 1 0 01-1.414 1.414L4 6.414V9a1 1 0 01-2 0V4zm14 12a1 1 0 01-1 1h-4a1 1 0 010-2h2.586l-4.293-4.293a1 1 0 011.414-1.414L16 13.586V11a1 1 0 012 0v5z" clip-rule="evenodd"/>
+            </svg>
           </button>
         </div>
-        <div class="flex items-center space-x-2">
-          <select 
-            id="pdfMode" 
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="whole">Extract Whole Document</option>
-            <option value="chapters">Split by Chapters (if available)</option>
-          </select>
-        </div>
-        <div id="pdfInfo" class="mt-2 text-sm text-gray-600 hidden">
-          <p id="pdfName"></p>
-          <p id="pdfSize"></p>
-          <div id="pdfStatus" class="mt-1"></div>
-        </div>
-        <div id="pdfError" class="mt-2 text-sm text-red-600 hidden"></div>
-        
-        <!-- New PDF Text Preview Section -->
-        <div id="pdfTextPreviewContainer" class="mt-4 hidden">
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="text-md font-semibold text-gray-700">PDF Text Preview</h3>
-            <button 
-              id="copyPdfTextBtn"
-              class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-300 ease-in-out flex items-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M8 3a1 1 0 011-1h2a1 1 0 011 1h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h2z" />
-                <path d="M11 3a1 1 0 00-1-1H8a1 1 0 00-1 1H5a2 2 0 00-2 2v9a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2h-2z" />
-              </svg>
-              Copy Text
-            </button>
-          </div>
+        <div class="relative">
           <textarea 
-            id="pdfTextPreview"
-            readonly
-            rows="6" 
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="textInput" 
+            placeholder="Type or paste the text you want to convert to speech..." 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-in-out textarea-collapsed resize-none"
           ></textarea>
         </div>
       </div>
-      
+
+      <!-- Voice Selection -->
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label for="languageSelect" class="block text-sm font-medium text-gray-700 mb-2">Select Language</label>
@@ -91,17 +88,6 @@ document.querySelector('#app')!.innerHTML = `
             <option value="">Select a language first</option>
           </select>
         </div>
-      </div>
-      
-      <div class="mb-4">
-        <label for="textInput" class="block text-sm font-medium text-gray-700 mb-2">Enter Text</label>
-        <textarea 
-          id="textInput" 
-          placeholder="Type the text you want to convert to speech..." 
-          rows="4" 
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></textarea>
-        <span id="characterCount" class="text-sm text-gray-600"></span>
       </div>
       
       <div id="loadingContainer" class="hidden mb-4 flex items-center justify-center">
@@ -121,28 +107,50 @@ document.querySelector('#app')!.innerHTML = `
         <audio id="audioPlayer" controls class="w-full"></audio>
       </div>
       
-      <div class="mt-4">
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Cached Voices</h2>
-        <div id="cachedVoicesContainer" class="border border-gray-200 rounded-md p-3 min-h-[100px]">
-          <p id="cachedVoicesPlaceholder" class="text-gray-500 text-center">No voices cached yet</p>
-          <ul id="cachedVoicesList" class="space-y-1"></ul>
+      <div class="mt-8">
+        <div class="flex items-center space-x-2 mb-2">
+          <h2 class="text-sm font-medium text-gray-700">Cached Voices</h2>
+          <button 
+            id="refreshCachedVoicesBtn"
+            class="text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
+          >
+            Refresh
+          </button>
+          <span class="text-gray-300">|</span>
+          <button 
+            id="clearCachedVoicesBtn"
+            class="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors duration-200"
+          >
+            Clear All
+          </button>
         </div>
-        <button 
-          id="refreshCachedVoicesBtn" 
-          class="mt-2 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-300 ease-in-out"
-        >
-          Refresh Cached Voices
-        </button>
-        <button 
-          id="clearCachedVoicesBtn" 
-          class="mt-2 w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 ease-in-out"
-        >
-          Clear All Cached Voices
-        </button>
+        <div id="cachedVoicesList" class="text-sm text-gray-600 space-y-1 min-h-[50px]"></div>
       </div>
     </div>
   </div>
 `;
+
+// Add custom styles for text area expansion
+const style = document.createElement('style');
+style.textContent = `
+  .textarea-expanded {
+    height: 400px !important;
+    transition: height 0.3s ease-in-out;
+  }
+  .textarea-collapsed {
+    height: 100px !important;
+    transition: height 0.3s ease-in-out;
+  }
+  .icon-expanded {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in-out;
+  }
+  .icon-collapsed {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease-in-out;
+  }
+`;
+document.head.appendChild(style);
 
 // Get DOM elements
 const languageSelect = document.getElementById('languageSelect') as HTMLSelectElement;
@@ -152,17 +160,32 @@ const generateBtn = document.getElementById('btn') as HTMLButtonElement;
 const audioPlayer = document.getElementById('audioPlayer') as HTMLAudioElement;
 const loadingContainer = document.getElementById('loadingContainer') as HTMLDivElement;
 const audioContainer = document.getElementById('audioContainer') as HTMLDivElement;
-const pdfInput = document.getElementById('pdfInput') as HTMLInputElement;
-const pdfUploadBtn = document.getElementById('pdfUploadBtn') as HTMLButtonElement;
-const pdfMode = document.getElementById('pdfMode') as HTMLSelectElement;
-const pdfInfo = document.getElementById('pdfInfo') as HTMLDivElement;
-const pdfName = document.getElementById('pdfName') as HTMLParagraphElement;
-const pdfSize = document.getElementById('pdfSize') as HTMLParagraphElement;
-const pdfStatus = document.getElementById('pdfStatus') as HTMLDivElement;
-const pdfError = document.getElementById('pdfError') as HTMLDivElement;
-const pdfTextPreviewContainer = document.getElementById('pdfTextPreviewContainer') as HTMLDivElement;
-const pdfTextPreview = document.getElementById('pdfTextPreview') as HTMLTextAreaElement;
-const copyPdfTextBtn = document.getElementById('copyPdfTextBtn') as HTMLButtonElement;
+const dropZone = document.getElementById('dropZone') as HTMLDivElement;
+const pdfFileInput = document.getElementById('pdfFileInput') as HTMLInputElement;
+const expandTextBtn = document.getElementById('expandTextBtn') as HTMLButtonElement;
+const expandIcon = document.getElementById('expandIcon') as SVGElement;
+
+// Initialize textarea with collapsed state
+textInput.classList.add('textarea-collapsed');
+expandIcon.classList.add('icon-collapsed');
+
+// Add expand/collapse functionality
+expandTextBtn.addEventListener('click', () => {
+  const textArea = textInput;
+  const icon = expandIcon;
+  
+  if (textArea.classList.contains('textarea-collapsed')) {
+    textArea.classList.remove('textarea-collapsed');
+    textArea.classList.add('textarea-expanded');
+    icon.classList.remove('icon-collapsed');
+    icon.classList.add('icon-expanded');
+  } else {
+    textArea.classList.remove('textarea-expanded');
+    textArea.classList.add('textarea-collapsed');
+    icon.classList.remove('icon-expanded');
+    icon.classList.add('icon-collapsed');
+  }
+});
 
 // Store voices data
 let availableVoices: tts.Voice[] = [];
@@ -268,20 +291,28 @@ generateBtn.addEventListener('click', async () => {
       voiceId: voiceId,
     });
 
-    worker.addEventListener('message', (event: MessageEvent<{ type: 'result', audio: Blob }>) => {
-      if (event.data.type != 'result') return;
-
+    worker.addEventListener('message', (event: MessageEvent<{ type: string, audio?: Blob, message?: string }>) => {
       // Hide loading and re-enable controls
       loadingContainer.classList.add('hidden');
       generateBtn.disabled = false;
       languageSelect.disabled = false;
       voiceSelect.disabled = false;
 
-      // Show audio
-      audioPlayer.src = URL.createObjectURL(event.data.audio);
-      audioContainer.classList.remove('hidden');
-      audioPlayer.play();
-      worker.terminate();
+      if (event.data.type === 'error') {
+        alert(event.data.message || 'Failed to generate speech');
+        return;
+      }
+
+      if (event.data.type === 'result' && event.data.audio) {
+        // Show audio
+        const currentAudioUrl = URL.createObjectURL(event.data.audio);
+        audioPlayer.src = currentAudioUrl;
+        audioContainer.classList.remove('hidden');
+        audioPlayer.play();
+      }
+
+      worker?.terminate();
+      worker = null;
     });
 
     worker.addEventListener('error', (error) => {
@@ -290,7 +321,10 @@ generateBtn.addEventListener('click', async () => {
       generateBtn.disabled = false;
       languageSelect.disabled = false;
       voiceSelect.disabled = false;
-      alert('Failed to generate speech. Check console for details.');
+      alert('Failed to generate speech. The text might be too long or contain unsupported characters.');
+      
+      worker?.terminate();
+      worker = null;
     });
 
   } catch (error) {
@@ -303,170 +337,104 @@ generateBtn.addEventListener('click', async () => {
   }
 });
 
-// Handle PDF upload button click
-pdfUploadBtn.addEventListener('click', () => {
-  pdfInput.click();
+// Add drag and drop functionality
+dropZone.addEventListener('click', () => {
+  pdfFileInput.click();
+});
+
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('border-blue-500', 'bg-blue-50');
+});
+
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+});
+
+dropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+  
+  const files = e.dataTransfer?.files;
+  if (files && files.length > 0) {
+    const file = files[0];
+    if (file.type === 'application/pdf') {
+      await handlePDFFile(file);
+    } else {
+      alert('Please upload a PDF file');
+    }
+  }
+});
+
+pdfFileInput.addEventListener('change', async () => {
+  const file = pdfFileInput.files?.[0];
+  if (file) {
+    await handlePDFFile(file);
+  }
 });
 
 // Handle PDF file selection
-pdfInput.addEventListener('change', async () => {
-  const file = pdfInput.files?.[0];
-  if (!file) return;
-
+async function handlePDFFile(file: File) {
   try {
-    // Reset UI
-    pdfError.classList.add('hidden');
-    pdfError.textContent = '';
-    pdfStatus.textContent = '';
-    pdfTextPreviewContainer.classList.add('hidden');
-    
-    // Show file info
-    pdfInfo.classList.remove('hidden');
-    pdfName.textContent = `File: ${file.name}`;
-    pdfSize.textContent = `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
-    pdfStatus.textContent = 'Processing PDF...';
-
-    // Extract text from PDF
-    const mode = pdfMode.value as 'whole' | 'chapters';
-    const text = await extractPDFText(file, mode);
-
-    console.log('Extracted text details:', {
-      length: text.length,
-      firstChars: text.slice(0, 500) + '...'
-    });
-
-    // Ensure text is not just whitespace
-    const trimmedText = text.trim();
-    if (!trimmedText) {
-      throw new Error('No readable text could be extracted from the PDF');
-    }
-
-    // Update text preview
-    pdfTextPreview.value = trimmedText;
-    pdfTextPreviewContainer.classList.remove('hidden');
-
-    // Update text input with a character limit warning
-    const MAX_TEXT_LENGTH = 10000; // Adjust as needed
-    if (trimmedText.length > MAX_TEXT_LENGTH) {
-      pdfStatus.textContent = `Warning: Text truncated to ${MAX_TEXT_LENGTH} characters`;
-      pdfStatus.className = 'mt-1 text-yellow-600';
-      textInput.value = trimmedText.slice(0, MAX_TEXT_LENGTH);
-    } else {
-      textInput.value = trimmedText;
-      pdfStatus.textContent = 'PDF processed successfully!';
-      pdfStatus.className = 'mt-1 text-green-600';
-    }
-
-    // Update character count
-    updateCharacterCount();
-
-    // Enable generate button if voice is selected
-    if (voiceSelect.value) {
-      generateBtn.disabled = false;
-    }
+    loadingContainer.classList.remove('hidden');
+    const text = await extractPDFText(file);
+    textInput.value = text;
+    loadingContainer.classList.add('hidden');
   } catch (error) {
-    console.error('Comprehensive PDF processing error:', error);
-    
-    // Detailed error handling
-    let errorMessage = 'Failed to process PDF';
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      
-      // More specific error messages
-      if (error.message.includes('No readable text')) {
-        errorMessage = 'Unable to extract text from PDF. The document might be scanned, image-based, or encrypted.';
-      } else if (error.message.includes('password')) {
-        errorMessage = 'PDF is password-protected. Please provide an unlocked version.';
-      }
-    }
-
-    // Update UI with error
-    pdfError.classList.remove('hidden');
-    pdfError.textContent = errorMessage;
-    pdfStatus.textContent = '';
-    textInput.value = ''; // Clear text input on error
-    pdfTextPreviewContainer.classList.add('hidden');
-    
-    // Reset character count
-    updateCharacterCount();
-  }
-});
-
-// Add a function to update character count
-function updateCharacterCount() {
-  const characterCount = document.getElementById('characterCount') as HTMLSpanElement;
-  if (characterCount) {
-    characterCount.textContent = `${textInput.value.length} characters`;
+    console.error('Error processing PDF:', error);
+    loadingContainer.classList.add('hidden');
+    alert('Error processing PDF file');
   }
 }
-
-// Add event listeners for cached voices functionality
-document.getElementById('refreshCachedVoicesBtn')?.addEventListener('click', displayCachedVoices);
-
-document.getElementById('clearCachedVoicesBtn')?.addEventListener('click', async () => {
-  await storage.flush();
-  await displayCachedVoices();
-});
 
 // Function to display cached voices
 async function displayCachedVoices() {
-  const cachedVoicesList = document.getElementById('cachedVoicesList') as HTMLUListElement;
-  const cachedVoicesPlaceholder = document.getElementById('cachedVoicesPlaceholder') as HTMLParagraphElement;
+  const cachedVoicesList = document.getElementById('cachedVoicesList')!;
   
   try {
-    const cachedVoices = await storage.stored();
+    const voices = await storage.stored();
     
-    // Clear previous list
-    cachedVoicesList.innerHTML = '';
-    
-    if (cachedVoices.length === 0) {
-      cachedVoicesPlaceholder.style.display = 'block';
-    } else {
-      cachedVoicesPlaceholder.style.display = 'none';
-      
-      cachedVoices.forEach(voiceId => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('flex', 'justify-between', 'items-center', 'bg-gray-100', 'px-3', 'py-1', 'rounded');
-        
-        const voiceText = document.createElement('span');
-        voiceText.textContent = voiceId;
-        
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'Remove';
-        removeButton.classList.add('text-red-600', 'hover:text-red-800', 'text-sm');
-        removeButton.addEventListener('click', async () => {
-          await storage.remove(voiceId);
-          await displayCachedVoices();
-        });
-        
-        listItem.appendChild(voiceText);
-        listItem.appendChild(removeButton);
-        cachedVoicesList.appendChild(listItem);
-      });
+    if (voices.length === 0) {
+      cachedVoicesList.innerHTML = '<p class="text-gray-500 italic">No voices cached</p>';
+      return;
     }
+
+    cachedVoicesList.innerHTML = voices
+      .map(voiceId => {
+        const name = availableVoices.find(v => v.id === voiceId)?.name || voiceId;
+        return `
+          <div class="flex items-center justify-between py-1">
+            <span>${name}</span>
+            <button 
+              class="text-red-500 hover:text-red-700 text-xs hover:underline"
+              onclick="(async () => { 
+                await storage.remove('${voiceId}'); 
+                displayCachedVoices();
+              })()">
+              Remove
+            </button>
+          </div>
+        `;
+      })
+      .join('');
   } catch (error) {
-    console.error('Error fetching cached voices:', error);
-    cachedVoicesList.innerHTML = `<li class="text-red-600">Error fetching cached voices</li>`;
+    console.error('Error displaying cached voices:', error);
+    cachedVoicesList.innerHTML = '<p class="text-red-500">Error loading cached voices</p>';
   }
 }
 
+// Add event listeners for cached voices
+document.getElementById('refreshCachedVoicesBtn')?.addEventListener('click', displayCachedVoices);
+
+document.getElementById('clearCachedVoicesBtn')?.addEventListener('click', async () => {
+  try {
+    await storage.flush();
+    displayCachedVoices();
+  } catch (error) {
+    console.error('Error clearing cached voices:', error);
+    alert('Error clearing cached voices');
+  }
+});
+
 // Initial display of cached voices
 displayCachedVoices();
-
-// Add copy functionality
-copyPdfTextBtn.addEventListener('click', () => {
-  // Copy text to clipboard
-  navigator.clipboard.writeText(pdfTextPreview.value).then(() => {
-    // Temporary visual feedback
-    copyPdfTextBtn.textContent = 'Copied!';
-    copyPdfTextBtn.classList.replace('bg-blue-500', 'bg-green-500');
-    
-    // Reset after 2 seconds
-    setTimeout(() => {
-      copyPdfTextBtn.textContent = 'Copy Text';
-      copyPdfTextBtn.classList.replace('bg-green-500', 'bg-blue-500');
-    }, 2000);
-  }).catch(err => {
-    console.error('Failed to copy text: ', err);
-  });
-});
