@@ -13,6 +13,18 @@ export default defineConfig({
       }
     }
   },
+  optimizeDeps: {
+    include: ['pdfjs-dist'],
+    esbuildOptions: {
+      target: 'esnext'
+    }
+  },
+  resolve: {
+    alias: {
+      // Ensure PDF.js worker is resolved correctly
+      'pdfjs-dist/build/pdf.worker.min.js': 'pdfjs-dist/build/pdf.worker.mjs'
+    }
+  },
   worker: {
     format: 'es',
     plugins: []
